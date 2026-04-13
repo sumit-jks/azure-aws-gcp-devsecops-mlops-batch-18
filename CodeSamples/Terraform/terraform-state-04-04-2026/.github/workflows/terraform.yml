@@ -10,6 +10,15 @@ jobs:
   terraform:
     name: "Terraform Job"
     runs-on: ubuntu-latest
+    
+    # Ye line add karein:
+    defaults:
+      run:
+        working-directory: CodeSamples/Terraform/terraform-state-04-04-2026
+
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      # ... baki ke env variables ...
 
     env:
       # Azure के Credentials जो आपने Secrets में डाले थे
