@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.69.0"
+      version = "4.67.0"
     }
   }
   backend "azurerm" {
@@ -19,7 +19,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rg1" {
   name     = "rg-mango"
-  location = "West US"
+  location = "Central India"
 }
 
 resource "azurerm_resource_group" "rg3" {
