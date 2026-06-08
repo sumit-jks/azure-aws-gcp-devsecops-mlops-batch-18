@@ -5,11 +5,11 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/terraform-practice/**'
+      - 'CodeSamples/terraform/terraform-practice/**'
 
   pull_request:
     paths:
-      - 'terraform/terraform-practice/**'
+      - 'CodeSamples/terraform/terraform-practice/**'
 
 jobs:
   terraform:
@@ -17,7 +17,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: terraform/terraform-practice
+        working-directory: CodeSamples/terraform/terraform-practice
 
     steps:
       - name: Checkout repository
