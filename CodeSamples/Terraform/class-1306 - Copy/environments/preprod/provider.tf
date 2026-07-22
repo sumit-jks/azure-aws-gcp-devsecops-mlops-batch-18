@@ -9,7 +9,7 @@ terraform {
     resource_group_name  = "rg-micro-dev"
     storage_account_name = "netfliixstoraage"
     container_name       = "tfstate"
-    key                  = "resource_group.tfstate"
+    key                  = "preprod.tfstate"
   }
 }
 
