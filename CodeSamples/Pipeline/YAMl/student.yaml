@@ -1,0 +1,20 @@
+rgs:
+  - rg-dhondhu
+  - rg-tondu
+
+ages:
+  - 56
+  - 34
+  - 120
+
+isGood:
+  - true
+  - false
+  - true
+
+# List of Maps
+resource_groups:
+- name: rg-dhondhu
+  location: eastus
+- name: rg-tondu
+  location: westus

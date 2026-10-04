@@ -1,0 +1,109 @@
+pool: vistara-agents
+
+trigger:
+- main
+- feature/*
+
+stages:
+
+  - stage: TerraformInitAndValidate
+    displayName: Init and Validate
+    jobs: 
+    - job: InitAndValidate
+      displayName: Init and Validate
+      steps:
+      - task: TerraformTask@5
+        displayName: Terraform Init
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environments/preprod'
+          backendServiceArm: 'corp-prod-01-sc'
+          backendAzureRmStorageAccountName: 'distoragetf786'
+          backendAzureRmContainerName: 'tfstate'
+          backendAzureRmKey: 'preprod.terraform.tfstate'
+
+      - task: TerraformTask@5
+        displayName: Terraform Validate
+        inputs:
+          provider: 'azurerm'
+          command: 'validate'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environments/preprod'
+
+
+  - stage: TerraformPlan
+    displayName: Plan
+    condition: succeeded()
+    dependsOn: TerraformInitAndValidate
+
+    jobs: 
+    - job: TerraformPlan
+      displayName: Plan
+      steps:
+      - task: TerraformTask@5
+        displayName: Terraform Init
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environments/preprod'
+          backendServiceArm: 'corp-prod-01-sc'
+          backendAzureRmStorageAccountName: 'distoragetf786'
+          backendAzureRmContainerName: 'tfstate'
+          backendAzureRmKey: 'preprod.terraform.tfstate'
+
+      - task: TerraformTask@5
+        displayName: Terraform Plan
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environments/preprod'
+          environmentServiceNameAzureRM: 'corp-prod-01-sc'
+
+
+  # 🔐 MANUAL APPROVAL
+  - stage: ManualApproval
+    displayName: Manual Approval Before Apply
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    dependsOn: TerraformPlan
+
+    jobs:
+    - job: Approval
+      displayName: Waiting for Approval
+      pool: server
+
+      steps:
+      - task: ManualValidation@1
+        displayName: Approve Terraform Apply
+        inputs:
+          notifyUsers: ''
+          instructions: 'Terraform Plan complete hai. Apply karne ke liye approval dein.'
+          onTimeout: 'reject'
+
+
+  - stage: TerraformApply
+    displayName: Apply
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    dependsOn: ManualApproval
+
+    jobs: 
+    - job: TerraformApply
+      displayName: Apply
+      steps:
+      - task: TerraformTask@5
+        displayName: Terraform Init
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environments/preprod'
+          backendServiceArm: 'corp-prod-01-sc'
+          backendAzureRmStorageAccountName: 'distoragetf786'
+          backendAzureRmContainerName: 'tfstate'
+          backendAzureRmKey: 'preprod.terraform.tfstate'
+
+      - task: TerraformTask@5
+        displayName: Terraform Apply
+        inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/environments/preprod'
+          environmentServiceNameAzureRM: 'corp-prod-01-sc'
